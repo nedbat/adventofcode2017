@@ -48,3 +48,38 @@ PUZZLE1_INPUT = "217523428149337669381721216749768791113624176532615223578558168
 
 if __name__ == '__main__':
     print(f"Puzzle 1 sum is {match_sum(PUZZLE1_INPUT)}")
+
+# Puzzle 2
+
+def halfway_pairs(s):
+    half = len(s) // 2
+    for i, el in enumerate(s):
+        yield el, s[(i + half) % len(s)]
+
+@pytest.mark.parametrize("s, result", [
+    ("1234", ["13", "24", "31", "42"])
+])
+def test_halfway_pairs(s, result):
+    assert list("".join(pair) for pair in halfway_pairs(s)) == result
+
+
+def match_halfway_sum(s):
+    """The sum of all digits that match their halfway-across partner."""
+    total = 0
+    for each, half in halfway_pairs(s):
+        if each == half:
+            total += int(each)
+    return total
+
+@pytest.mark.parametrize("s, result", [
+    ("1212", 6),
+    ("1221", 0),
+    ("123425", 4),
+    ("123123", 12),
+    ("12131415", 4),
+])
+def test_match_halfway_sum(s, result):
+    assert match_halfway_sum(s) == result
+
+if __name__ == '__main__':
+    print(f"Puzzle 2 sum is {match_halfway_sum(PUZZLE1_INPUT)}")
