@@ -2,6 +2,7 @@
 http://adventofcode.com/2017/day/3
 """
 
+import itertools
 import math
 
 import pytest
@@ -79,3 +80,41 @@ INPUT = 289326
 
 if __name__ == '__main__':
     print(f"Part 1: the distance to {INPUT} is {distance_to_port(INPUT)}")
+
+
+# Part 2: completely different solution! :)
+
+def neighbors(x, y):
+    """Produce coordinates of neighbors."""
+    for dx in [-1, 0, 1]:
+        for dy in [-1, 0, 1]:
+            if dx or dy:
+                yield x + dx, y + dy
+
+
+class MemoryGrid:
+    def __init__(self):
+        # Maps tuples of coordinates to values.
+        self.cells = {}
+
+    def sum_of_neighbors(self, x, y):
+        return sum(self.cells.get((nx, ny), 0) for nx, ny in neighbors(x, y))
+
+    def stress_fill(self):
+        self.cells[(0, 0)] = 1
+        yield 1
+        for n in itertools.count(start=2):
+            x, y = location_of(n)
+            self.cells[(x, y)] = val = self.sum_of_neighbors(x, y)
+            yield val
+
+def test_stress_fill():
+    grid = MemoryGrid()
+    result = [1, 1, 2, 4, 5, 10, 11, 23, 25, 26, 54, 57, 59, 122, 133, 142, 147, 304, 330, 351, 362, 747, 806]
+    assert list(itertools.islice(grid.stress_fill(), len(result))) == result
+
+
+if __name__ == '__main__':
+    grid = MemoryGrid()
+    answer = next(itertools.dropwhile(lambda v: v < INPUT, grid.stress_fill()))
+    print(f"Part 2: the first value more than {INPUT} is {answer}")
