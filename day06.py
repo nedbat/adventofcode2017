@@ -24,11 +24,10 @@ def reallocate_once(banks):
     pos = max_index(banks)
     blocks = banks[pos]
     banks[pos] = 0
-    while blocks:
+    for _ in range(blocks):
         pos += 1
         pos %= len(banks)
         banks[pos] += 1
-        blocks -= 1
     return banks
 
 @pytest.mark.parametrize("before, after", [
