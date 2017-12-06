@@ -39,23 +39,29 @@ def test_reallocate_once(before, after):
 
 
 def count_reallocations(banks):
-    seen = set()
-    seen.add(tuple(banks))
+    """Reallocate blocks until a previous state is found.
+
+    Returns total steps, and size of loop.
+    """
+    seen = {}
+    seen[tuple(banks)] = 0
     while True:
         banks = reallocate_once(banks)
         tbanks = tuple(banks)
         if tbanks in seen:
+            loop_state = seen[tbanks]
             break
-        seen.add(tbanks)
-    return len(seen)
+        seen[tbanks] = len(seen)
+    return len(seen), len(seen) - loop_state
 
 def test_count_reallocations():
-    assert count_reallocations([0, 2, 7, 0]) == 5
+    assert count_reallocations([0, 2, 7, 0]) == (5, 4)
 
 
 INPUT = "4	1	15	12	0	9	9	5	5	8	7	3	14	5	12	3"
 
 if __name__ == '__main__':
     banks = list(map(int, INPUT.split()))
-    steps = count_reallocations(banks)
+    steps, cycle_size = count_reallocations(banks)
     print(f"Part 1: saw a previous configuration after {steps} cycles")
+    print(f"Part 2: the loop has {cycle_size} steps")
