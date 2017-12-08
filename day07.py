@@ -25,20 +25,26 @@ cntj (57)
 """
 
 
-def different(seq, key=None):
+def oddity(iterable, key=None):
     """
-    Find the element of seq that is different.
+    Find the element that is different.
 
-    Returns:
-        (common_key, different_value)
+    The iterable has at most one element different than the others.   If a
+    `key` function is provided, it is a function used to extract a comparison
+    key from each element, otherwise the elements themselves are compared.
 
-    If everything in seq is equal, then different_value is None.
+    Two values are returned: the common comparison key, and the different
+    element.
+
+    If all of the elements are equal, then the returned different element is
+    None.  If there is more than one different element, an error is raised.
+
     """
     if key is None:
         key = lambda v: v
     summary = collections.defaultdict(list)
-    for value in seq:
-        summary[key(value)].append(value)
+    for element in iterable:
+        summary[key(element)].append(element)
 
     if len(summary) == 1:
         k, _ = summary.popitem()
@@ -51,13 +57,13 @@ def different(seq, key=None):
     else:
         raise ValueError("Wrong number of distinct values")
 
-@pytest.mark.parametrize("seq, key, answer", [
+@pytest.mark.parametrize("iterable, key, answer", [
     ("aaaaba", None, ("a", "b")),
     ("aaaaaa", None, ("a", None)),
     ([10, 11, 12, 23, 14, 10], lambda v: v // 10, (1, 23)),
 ])
-def test_different(seq, key, answer):
-    assert different(seq, key) == answer
+def test_oddity(iterable, key, answer):
+    assert oddity(iterable, key) == answer
 
 
 class Towers:
@@ -96,7 +102,7 @@ class Towers:
         if len(weights) == 0:
             odd = None
         else:
-            common, odd = different(weights, key=lambda pair: pair[0])
+            common, odd = oddity(weights, key=lambda pair: pair[0])
         if odd is None:
             # My children (if any) are balanced, i'm the problem
             return program, goal - common * len(weights)
