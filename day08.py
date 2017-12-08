@@ -25,6 +25,7 @@ CONDITIONS = {
 
 def execute(lines):
     registers = collections.defaultdict(int)
+    high_water = 0
     for line in lines:
         m = re.search(r"^(\w+) (\w+) (-?\d+) if (\w+) ([<>=!]+) (-?\d+)", line)
         if not m:
@@ -36,17 +37,20 @@ def execute(lines):
             if op == "dec":
                 amount = -amount
             registers[target] += amount
-    return registers
+            if registers[target] > high_water:
+                high_water = registers[target]
+    return registers, high_water
 
 def max_result(lines):
-    registers = execute(lines)
-    return max(registers.values())
+    registers, high_water = execute(lines)
+    return max(registers.values()), high_water
 
 def test_max_result():
-    assert max_result(TEST_DATA.splitlines()) == 1
+    assert max_result(TEST_DATA.splitlines()) == (1, 10)
 
 
 if __name__ == '__main__':
     with open("day08_input.txt") as finput:
-        result = max_result(finput)
+        result, high_water = max_result(finput)
     print(f"Part 1: the largest value is {result}")
+    print(f"Part 2: the largest value ever was {high_water}")
