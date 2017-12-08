@@ -112,20 +112,21 @@ class Towers:
                 return self.imbalance(odd[1], common)
 
 
-def test_bottom_program():
+@pytest.fixture
+def test_towers():
     towers = Towers()
     towers.read(TEST.splitlines())
-    assert towers.bottom_program() == "tknk"
+    return towers
 
-def test_total_weight():
-    towers = Towers()
-    towers.read(TEST.splitlines())
-    assert towers.total_weight('ugml') == 251
+def test_bottom_program(test_towers):
+    assert test_towers.bottom_program() == "tknk"
 
-def test_imbalance():
-    towers = Towers()
-    towers.read(TEST.splitlines())
-    assert towers.imbalance() == ('ugml', 60)
+def test_total_weight(test_towers):
+    assert test_towers.total_weight('ugml') == 251
+
+def test_imbalance(test_towers):
+    assert test_towers.imbalance() == ('ugml', 60)
+
 
 if __name__ == '__main__':
     with open("day07_input.txt") as finput:
@@ -134,11 +135,6 @@ if __name__ == '__main__':
 
     bottom = towers.bottom_program()
     print(f"Part 1: the bottom program is {bottom}")
-
-if __name__ == '__main__':
-    with open("day07_input.txt") as finput:
-        towers = Towers()
-        towers.read(finput)
 
     who, how_much = towers.imbalance()
     print(f"Part 2: {who} should be {how_much} to balance")
