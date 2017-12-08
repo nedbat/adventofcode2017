@@ -65,6 +65,14 @@ def oddity(iterable, key=None):
 def test_oddity(iterable, key, answer):
     assert oddity(iterable, key) == answer
 
+@pytest.mark.parametrize("iterable, key", [
+    ("aaaaaabc", None),
+    ("", None),
+])
+def test_oddity_error(iterable, key):
+    with pytest.raises(ValueError):
+        oddity(iterable, key)
+
 
 class Towers:
     def __init__(self):
