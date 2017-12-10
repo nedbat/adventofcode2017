@@ -9,6 +9,16 @@ import pytest
 
 
 class Circle:
+    """
+    A circular list.
+
+    Slicing at indexes beyond the length of the list wrap around to the
+    beginning.  Assignment to these slices works also.
+
+    Not supported: simple indexing, negative slices, or assignment of different
+    length data.
+
+    """
     def __init__(self, lst):
         self.lst = lst
 
@@ -58,7 +68,8 @@ def test_set(start, stop, length, result):
 
 
 def knot_hash(data, lengths, rounds=1):
-    circle = Circle(data)
+    lst = list(data)
+    circle = Circle(lst)
     pos = 0
     skip = 0
     for _ in range(rounds):
@@ -66,20 +77,18 @@ def knot_hash(data, lengths, rounds=1):
             circle[pos:pos+length] = reversed(circle[pos:pos+length])
             pos += length + skip
             skip += 1
-
+    return lst
 
 def test_knot_hash():
-    data = list(range(5))
-    knot_hash(data, [3, 4, 1, 5])
-    assert data == [3, 4, 2, 1, 0]
+    knotted = knot_hash(range(5), [3, 4, 1, 5])
+    assert knotted == [3, 4, 2, 1, 0]
 
 INPUT = "97,167,54,178,2,11,209,174,119,248,254,0,255,1,64,190"
 
 if __name__ == '__main__':
     lengths = list(map(int, INPUT.split(",")))
-    data = list(range(256))
-    knot_hash(data, lengths)
-    result = data[0] * data[1]
+    knotted = knot_hash(range(256), lengths)
+    result = knotted[0] * knotted[1]
     print(f"Part 1: multiplying the first two numbers gives {result}")
 
 
@@ -94,12 +103,11 @@ STD_LENGTH_SUFFIX = [17, 31, 73, 47, 23]
 
 def full_knot_hash(data):
     lengths = list(ascii_codes(data)) + STD_LENGTH_SUFFIX
-    data = list(range(256))
-    knot_hash(data, lengths, rounds=64)
+    knotted = knot_hash(range(256), lengths, rounds=64)
 
     hexbytes = []
     for i in range(0, 256, 16):
-        xored = functools.reduce(operator.xor, data[i:i+16])
+        xored = functools.reduce(operator.xor, knotted[i:i+16])
         hexbytes.append("{:02x}".format(xored))
 
     return "".join(hexbytes)
