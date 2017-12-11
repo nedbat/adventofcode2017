@@ -86,9 +86,30 @@ def test_steps_to(steps, shorter):
     assert ",".join(steps_to((0, 0), finish)) == shorter
 
 
+def fewest_steps_to(pos1, pos2):
+    return len(list(steps_to(pos1, pos2)))
+
 if __name__ == '__main__':
     with open("day11_input.txt") as finput:
         steps = finput.read().strip()
     finish = move((0, 0), steps)
-    direct = list(steps_to((0, 0), finish))
-    print(f"Part 1: fewest step to {finish} is {len(direct)} steps.")
+    fewest = fewest_steps_to((0, 0), finish)
+    print(f"Part 1: fewest step to {finish} is {fewest} steps.")
+
+# This is kind of brute-force, but the data is small...!
+
+def track_furthest(steps):
+    pos = (0, 0)
+    furthest = 0
+    for step in steps.split(","):
+        pos = move(pos, step)
+        distance = fewest_steps_to((0, 0), pos)
+        if distance > furthest:
+            furthest = distance
+    return furthest
+
+if __name__ == '__main__':
+    with open("day11_input.txt") as finput:
+        steps = finput.read().strip()
+    furthest = track_furthest(steps)
+    print(f"Part 1: the furthest he got was {furthest} steps away.")
