@@ -46,3 +46,6 @@ if __name__ == '__main__':
     with open("day12_input.txt") as finput:
         progs.read(finput)
     print(f"Part 1: the group with program ID 0 has {len(progs.progs[0])} programs.")
+
+    group_ids = set(id(s) for s in progs.progs.values())
+    print(f"Part 2: there are {len(group_ids)} groups in total.")
