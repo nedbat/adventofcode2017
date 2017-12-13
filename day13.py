@@ -2,6 +2,8 @@
 http://adventofcode.com/2017/day/13
 """
 
+import itertools
+
 TEST_LAYERS = [(0, 3), (1, 2), (4, 4), (6, 4)]
 
 def catches(layers, n):
@@ -67,3 +69,16 @@ INPUT = [
 
 if __name__ == '__main__':
     print(f"Part 1: the severity of the whole trip is {severity(INPUT, 0)}")
+
+
+def safe_delay(layers):
+    # Brute-force it...
+    for delay in itertools.count():
+        if not any(catches(layers, delay)):
+            return delay
+
+def test_safe_delay():
+    assert safe_delay(TEST_LAYERS) == 10
+
+if __name__ == '__main__':
+    print(f"Part 2: the safe delay is {safe_delay(INPUT)}")
