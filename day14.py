@@ -48,3 +48,46 @@ INPUT = "xlqgujun"
 if __name__ == '__main__':
     grid = grid_from_key(INPUT)
     print(f"Part 1: {len(grid)} squares are used.")
+
+
+def adjacent_coordinates(pt):
+    """What are the adjacent points on a 128-square grid?"""
+    x, y = pt
+    if x > 0:
+        yield x - 1, y
+    if x < 127:
+        yield x + 1, y
+    if y > 0:
+        yield x, y - 1
+    if y < 127:
+        yield x, y + 1
+
+
+def adjacent_pairs(grid):
+    """Produce all pairs of adjacent filled squares."""
+    for pt1 in grid:
+        for pt2 in adjacent_coordinates(pt1):
+            if pt2 in grid:
+                yield pt1, pt2
+
+def grid_regions(grid):
+    regions = {pt: {pt} for pt in grid}
+    for pt1, pt2 in adjacent_pairs(grid):
+        connected = regions[pt1] | regions[pt2] | {pt1, pt2}
+        for p in connected:
+            regions[p] = connected
+    return regions
+
+def count_regions(grid):
+    regions = grid_regions(grid)
+    regions_ids = set(id(r) for r in regions.values())
+    return len(regions_ids)
+
+def test_count_regions():
+    grid = grid_from_key("flqrgnkx")
+    assert count_regions(grid) == 1242
+
+
+if __name__ == '__main__':
+    grid = grid_from_key(INPUT)
+    print(f"Part 2: there are {count_regions(grid)} regions.")
