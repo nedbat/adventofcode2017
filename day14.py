@@ -73,7 +73,7 @@ def adjacent_pairs(grid):
 def grid_regions(grid):
     regions = {pt: {pt} for pt in grid}
     for pt1, pt2 in adjacent_pairs(grid):
-        connected = regions[pt1] | regions[pt2] | {pt1, pt2}
+        connected = regions[pt1] | regions[pt2]
         for p in connected:
             regions[p] = connected
     return regions
