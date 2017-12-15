@@ -10,11 +10,12 @@ FACTOR_A = 16807
 FACTOR_B = 48271
 DIVISOR = 2147483647
 
-def generator(start, factor):
+def generator(start, factor, criterion=1):
     value = start
     while True:
         value = value * factor % DIVISOR
-        yield value
+        if value % criterion == 0:
+            yield value
 
 TEST_A_START = 65
 TEST_B_START = 8921
@@ -44,3 +45,16 @@ INPUT_B_START = 325
 if __name__ == '__main__':
     num = count_generator_matches(INPUT_A_START, INPUT_B_START)
     print(f"Part 1: judge's final count is {num}")
+
+
+def count_generator_matches_part2(start_a, start_b):
+    gen_a = generator(start_a, FACTOR_A, criterion=4)
+    gen_b = generator(start_b, FACTOR_B, criterion=8)
+    return count_low16_matches(itertools.islice(zip(gen_a, gen_b), 5_000_000))
+
+def test_count_generator_matches_part2():
+    assert count_generator_matches_part2(TEST_A_START, TEST_B_START) == 309
+
+if __name__ == '__main__':
+    num = count_generator_matches_part2(INPUT_A_START, INPUT_B_START)
+    print(f"Part 2: judge's final count is {num}")
