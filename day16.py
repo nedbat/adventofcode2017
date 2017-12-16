@@ -60,3 +60,15 @@ if __name__ == '__main__':
         steps = finput.read()
     result = run_steps(steps, "abcdefghijklmnop")
     print(f"Part 1: the programs are in this order: {result}")
+
+    order = "abcdefghijklmnop"
+    for _ in range(1_000):
+        order = run_steps(steps, order)
+    print(order)
+
+    # abcdefghijklmnop  step 0
+    # agndefjhibklmocp  step 1000
+    #
+    # loops:  bgj  cno  
+    # Therefore, it's all mod 3.  1 billion is 1 mod 3, just like 1000 is.
+    # So the answer for 1 billion is the same as the answer for 1000.
