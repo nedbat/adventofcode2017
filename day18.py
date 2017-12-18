@@ -136,11 +136,17 @@ class Processor2:
         self.recipient = None
         self.num_sent = 0
 
+    def __getitem__(self, name):
+        return self.registers[name]
+
+    def __setitem__(self, name, value):
+        self.registers[name] = value
+
     def value(self, arg):
         try:
             return int(arg)
         except ValueError:
-            return self.registers[arg]
+            return self[arg]
 
     def receive(self, value):
         self.q.append(value)
@@ -151,20 +157,20 @@ class Processor2:
         self.num_sent += 1
 
     def op_set(self, x, y):
-        self.registers[x] = self.value(y)
+        self[x] = self.value(y)
 
     def op_add(self, x, y):
-        self.registers[x] += self.value(y)
+        self[x] += self.value(y)
 
     def op_mul(self, x, y):
-        self.registers[x] *= self.value(y)
+        self[x] *= self.value(y)
 
     def op_mod(self, x, y):
-        self.registers[x] %= self.value(y)
+        self[x] %= self.value(y)
 
     def op_rcv(self, x):
         if self.q:
-            self.registers[x] = self.q.popleft()
+            self[x] = self.q.popleft()
         else:
             self.ready = False
 
@@ -185,8 +191,8 @@ def run_two(instructions):
     p1 = Processor2(instructions)
     p0.recipient = p1
     p1.recipient = p0
-    p0.registers['p'] = 0
-    p1.registers['p'] = 1
+    p0['p'] = 0
+    p1['p'] = 1
 
     while True:
         if p0.ready:
