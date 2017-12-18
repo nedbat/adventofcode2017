@@ -173,7 +173,6 @@ class Processor2:
             return self.value(y)
 
     def one_step(self):
-        assert self.ready
         op, *args = self.instructions[self.pc]
         func = getattr(self, f"op_{op}")
         pc_delta = func(*args)
@@ -182,18 +181,18 @@ class Processor2:
 
 
 def run_two(instructions):
+    p0 = Processor2(instructions)
     p1 = Processor2(instructions)
-    p2 = Processor2(instructions)
-    p1.recipient = p2
-    p2.recipient = p1
+    p0.recipient = p1
+    p1.recipient = p0
+    p0.registers['p'] = 0
     p1.registers['p'] = 1
-    p2.registers['p'] = 2
 
     while True:
-        if p1.ready:
+        if p0.ready:
+            p0.one_step()
+        elif p1.ready:
             p1.one_step()
-        elif p2.ready:
-            p2.one_step()
         else:
             # deadlocked!
             return p1.num_sent
