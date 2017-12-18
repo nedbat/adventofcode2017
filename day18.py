@@ -64,7 +64,7 @@ jgz a -2
 class RecoveredFrequency(Exception):
     pass
 
-class Processor:
+class Processor1:
     def __init__(self):
         self.registers = collections.defaultdict(int)
         self.last_sound = None
@@ -114,13 +114,94 @@ class Processor:
                 pc += 1
 
 
-def test_processor():
-    processor = Processor()
+def test_processor1():
+    processor = Processor1()
     sound = processor.run_program(TEST_INPUT.splitlines())
     assert sound == 4
 
 
 if __name__ == '__main__':
-    processor = Processor()
+    processor = Processor1()
     sound = processor.run_program(INPUT.splitlines())
     print(f"Part 1: the recovered frequency is {sound}")
+
+
+class Processor2:
+    def __init__(self, instructions):
+        self.registers = collections.defaultdict(int)
+        self.instructions = [line.split() for line in instructions]
+        self.pc = 0
+        self.ready = True
+        self.q = collections.deque()
+        self.recipient = None
+        self.num_sent = 0
+
+    def value(self, arg):
+        try:
+            return int(arg)
+        except ValueError:
+            return self.registers[arg]
+
+    def receive(self, value):
+        self.q.append(value)
+        self.ready = True
+
+    def op_snd(self, x):
+        self.recipient.receive(self.value(x))
+        self.num_sent += 1
+
+    def op_set(self, x, y):
+        self.registers[x] = self.value(y)
+
+    def op_add(self, x, y):
+        self.registers[x] += self.value(y)
+
+    def op_mul(self, x, y):
+        self.registers[x] *= self.value(y)
+
+    def op_mod(self, x, y):
+        self.registers[x] %= self.value(y)
+
+    def op_rcv(self, x):
+        if self.q:
+            self.registers[x] = self.q.popleft()
+        else:
+            self.ready = False
+
+    def op_jgz(self, x, y):
+        if self.value(x) > 0:
+            return self.value(y)
+
+    def one_step(self):
+        assert self.ready
+        op, *args = self.instructions[self.pc]
+        func = getattr(self, f"op_{op}")
+        pc_delta = func(*args)
+        if self.ready:
+            self.pc += pc_delta if pc_delta is not None else 1
+
+
+def run_two(instructions):
+    p1 = Processor2(instructions)
+    p2 = Processor2(instructions)
+    p1.recipient = p2
+    p2.recipient = p1
+    p1.registers['p'] = 1
+    p2.registers['p'] = 2
+
+    while True:
+        if p1.ready:
+            p1.one_step()
+        elif p2.ready:
+            p2.one_step()
+        else:
+            # deadlocked!
+            return p1.num_sent
+
+def test_run_two():
+    assert run_two("snd 1;snd 2;snd p;rcv a;rcv b;rcv c;rcv d".split(";")) == 3
+
+
+if __name__ == '__main__':
+    sent = run_two(INPUT.splitlines())
+    print(f"Part 2: program 1 sent {sent} values")
