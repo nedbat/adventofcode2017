@@ -136,37 +136,34 @@ class Processor2:
         self.recipient = None
         self.num_sent = 0
 
-    def __getitem__(self, name):
-        return self.registers[name]
-
-    def __setitem__(self, name, value):
-        self.registers[name] = value
-
-    def value(self, arg):
+    def __getitem__(self, arg):
         try:
             return int(arg)
         except ValueError:
-            return self[arg]
+            return self.registers[arg]
+
+    def __setitem__(self, name, value):
+        self.registers[name] = value
 
     def receive(self, value):
         self.q.append(value)
         self.ready = True
 
     def op_snd(self, x):
-        self.recipient.receive(self.value(x))
+        self.recipient.receive(self[x])
         self.num_sent += 1
 
     def op_set(self, x, y):
-        self[x] = self.value(y)
+        self[x] = self[y]
 
     def op_add(self, x, y):
-        self[x] += self.value(y)
+        self[x] += self[y]
 
     def op_mul(self, x, y):
-        self[x] *= self.value(y)
+        self[x] *= self[y]
 
     def op_mod(self, x, y):
-        self[x] %= self.value(y)
+        self[x] %= self[y]
 
     def op_rcv(self, x):
         if self.q:
@@ -175,8 +172,8 @@ class Processor2:
             self.ready = False
 
     def op_jgz(self, x, y):
-        if self.value(x) > 0:
-            return self.value(y)
+        if self[x] > 0:
+            return self[y]
 
     def one_step(self):
         op, *args = self.instructions[self.pc]
