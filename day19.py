@@ -27,6 +27,7 @@ def walk_diagram(diagram):
     dx = 0
     dy = 1
     seen = ""
+    steps = 0
     while True:
         c = diagram[posy][posx]
         if c == '+':
@@ -37,20 +38,22 @@ def walk_diagram(diagram):
                     break
         elif c == ' ':
             # done
-            return seen
+            return seen, steps
         else:
             if c not in '|-':
                 seen += c
             posx += dx
             posy += dy
+        steps += 1
 
 
 def test_walk_diagram():
-    assert walk_diagram(TEST_INPUT.splitlines()) == 'ABCDEF'
+    assert walk_diagram(TEST_INPUT.splitlines()) == ('ABCDEF', 38)
 
 
 if __name__ == '__main__':
     with open("day19_input.txt") as finput:
         diagram = finput.readlines()
-    seen = walk_diagram(diagram)
+    seen, steps = walk_diagram(diagram)
     print(f"Part 1: the packet sees the letters {seen}")
+    print(f"Part 1: the packet takes {steps} steps")
