@@ -5,17 +5,13 @@ http://adventofcode.com/2017/day/20
 import itertools
 import re
 
+import attr
+
+@attr.s
 class Xyz:
-    def __init__(self, x, y, z):
-        self.x = int(x)
-        self.y = int(y)
-        self.z = int(z)
-
-    def __repr__(self):
-        return f"<{self.x},{self.y},{self.z}>"
-
-    def __eq__(self, other):
-        return (self.x, self.y, self.z) == (other.x, other.y, other.z)
+    x = attr.ib()
+    y = attr.ib()
+    z = attr.ib()
 
     def __add__(self, other):
         return Xyz(self.x + other.x, self.y + other.y, self.z + other.z)
@@ -23,15 +19,12 @@ class Xyz:
     def __len__(self):
         return abs(self.x) + abs(self.y) + abs(self.z)
 
+@attr.s
 class Pt:
-    def __init__(self, i, p, v, a):
-        self.i = i
-        self.p = p
-        self.v = v
-        self.a = a
-
-    def __repr__(self):
-        return f"i={self.i}, p={self.p}, v={self.v}, a={self.a}"
+    i = attr.ib()
+    p = attr.ib()
+    v = attr.ib()
+    a = attr.ib()
 
     def update(self):
         self.v += self.a
@@ -42,7 +35,7 @@ class Pt:
         xyz = r"<(-?\d+),(-?\d+),(-?\d+)>"
         m = re.match(f"p={xyz}, v={xyz}, a={xyz}", line)
         if m:
-            px, py, pz, vx, vy, vz, ax, ay, az = m.groups()
+            px, py, pz, vx, vy, vz, ax, ay, az = map(int, m.groups())
             return Pt(i, Xyz(px, py, pz), Xyz(vx, vy, vz), Xyz(ax, ay, az))
 
 def read_points(lines):
