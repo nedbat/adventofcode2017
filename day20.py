@@ -1,0 +1,51 @@
+"""
+http://adventofcode.com/2017/day/20
+"""
+
+import re
+
+class Xyz:
+    def __init__(self, x, y, z):
+        self.x = int(x)
+        self.y = int(y)
+        self.z = int(z)
+
+    def __repr__(self):
+        return f"<{self.x},{self.y},{self.z}>"
+
+    def __add__(self, other):
+        return Xyz(self.x + other.x, self.y + other.y, self.z + other.z)
+
+    def __len__(self):
+        return abs(self.x) + abs(self.y) + abs(self.z)
+
+class Pt:
+    def __init__(self, i, p, v, a):
+        self.i = i
+        self.p = p
+        self.v = v
+        self.a = a
+
+    def __repr__(self):
+        return f"i={self.i}, p={self.p}, v={self.v}, a={self.a}"
+
+    def update(self):
+        self.v += self.a
+        self.p += self.v
+
+    @classmethod
+    def parse(cls, i, line):
+        xyz = r"<(-?\d+),(-?\d+),(-?\d+)>"
+        m = re.match(f"p={xyz}, v={xyz}, a={xyz}", line)
+        if m:
+            px, py, pz, vx, vy, vz, ax, ay, az = m.groups()
+            return Pt(i, Xyz(px, py, pz), Xyz(vx, vy, vz), Xyz(ax, ay, az))
+
+def read_points(lines):
+    return [Pt.parse(i, line) for i, line in enumerate(lines)]
+
+if __name__ == '__main__':
+    with open("day20_input.txt") as finput:
+        points = read_points(finput)
+    closest = min(points, key=lambda pt: (len(pt.a), len(pt.v), len(pt.p)))
+    print(f"Part 1: the point that stays closest to 0 is {closest}")
