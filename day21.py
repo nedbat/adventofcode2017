@@ -112,9 +112,12 @@ def test_run_rules():
     actual = list(itertools.islice(run_rules(rules), 3))
     assert actual == expected
 
+def on_after(rules, n):
+    grid = next(itertools.islice(run_rules(rules), n, None))
+    return grid.count("#")
+
 if __name__ == '__main__':
     with open("day21_input.txt") as finput:
         rules = read_rules(finput)
-    fifth = next(itertools.islice(run_rules(rules), 5, None))
-    on_pixels = fifth.count("#")
-    print(f"Part 1: after 5 iterations, there are {on_pixels} pixels on.")
+    print(f"Part 1: after 5 iterations, there are {on_after(rules, 5)} pixels on.")
+    print(f"Part 1: after 18 iterations, there are {on_after(rules, 18)} pixels on.")
