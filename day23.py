@@ -39,7 +39,6 @@ sub b -17
 jnz 1 -23
 """
 
-
 class Processor:
     def __init__(self, instructions):
         self.registers = collections.defaultdict(int)
@@ -85,3 +84,60 @@ if __name__ == '__main__':
         pass
     print(proc.op_counts)
     print(f"Part 1: mul has been executed {proc.op_counts['mul']} times.")
+
+# Manually rewrote the program to:
+#
+#    0] b = 79
+#    1] c = b
+#    2] if a != 0:
+#    4]     b *= 100
+#    5]     b += 100000
+#    6]     c = b
+#    7]     c += 17000
+#       while True:
+#    8]     f = 1
+#    9]     d = 2
+#           do:
+#   10]         e = 2
+#               do:
+#   14]             if d * e == b:
+#   15]                 f = 0
+#   16]             e += 1
+#   19]         ..while e != b
+#   20]         d += 1
+#   23]     ..while d != b
+#   24]     if f == 0:
+#   25]         h += 1
+#   28]     if b == c:
+#   29]         exit
+#   30]     b += 17
+#
+# and then to:
+#
+#   h = 0
+#   for b in range(107900, 124900, 17):
+#       f = False
+#       for d in range(2, b):
+#           for e in range(2, b):
+#               if d * e == b:
+#                   f = True
+#       if f:
+#           h += 1
+#   print(h)
+#
+# So register h is the number of non-prime numbers in range(107900, 124900, 17).
+
+if __name__ == '__main__':
+    import itertools
+    import math
+
+    def non_primes(start, stop, step):
+        for n in range(start, stop, step):
+            for f in range(2, int(math.sqrt(n)) + 1):
+                if n % f == 0:
+                    yield n
+                    break
+
+    lower, upper, step = 107900, 124900, 17
+    num_non_primes = len(list(non_primes(lower, upper+1, step)))
+    print(f"Part 2: register h will have {num_non_primes}")
