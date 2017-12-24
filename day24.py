@@ -131,3 +131,19 @@ if __name__ == '__main__':
     components = parse_components(INPUT.splitlines())
     best = best_bridge(components)
     print(f"Part 1: the strongest bridge has strength {strength(best)}")
+
+
+def best_bridge2(components):
+    """Find the strongest of the longest bridges."""
+    return max(bridges(components), key=lambda b: (len(b), strength(b)))
+
+def test_best_bridge2():
+    components = parse_components(TEST_INPUT.splitlines())
+    best = best_bridge2(components)
+    assert strength(best) == 19
+
+
+if __name__ == '__main__':
+    components = parse_components(INPUT.splitlines())
+    best = best_bridge2(components)
+    print(f"Part 1: the strongest longest bridge has strength {strength(best)}")
